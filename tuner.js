@@ -19,31 +19,43 @@ var instruments =
 function noteFrequency(note) {
     // Normalise:
     note = note.toUpperCase();
-    //How many semitones above A are we?
-    var semitoneOffset = 0;
+    var semitoneOffset = 0; // relative to A, ignoring octaves
 
-    //TODO: Allow sharps, e.g. Cs4
+    //Only allow valid notes
+    if (note.match(/^[ABCDEFG]S?/)) {
+            note = note + "4"; // Assume octave 4 if none given.
+    }
+    if (note.match(/^[ABCDEFG]S?\d/) == null) { return false; }
+
+    if (note.match(/^[CDFG]S/)) { // Only allowed certain notes to be sharp
+         console.log("sharp");
+         semitoneOffset += 1;
+         note = note.replace("S", ""); // Get rid of the sharp, we've dealt with it...
+    } else if (note.match(/^[ABE]S/)) {
+        console.log("Error: invalid note. Not all notes can be \"sharp\"!");
+        return false; // Invalid note!
+    }
 
     switch (note[0]) {
         case "A":
             break;
         case "B":
-            semitoneOffset = 2;
+            semitoneOffset += 2;
             break;
         case "C":
-            semitoneOffset = 3 - 12; // base of numbering is C, so C and above need to be taken an octave down.
+            semitoneOffset += 3 - 12; // base of numbering is C, so C and above need to be taken an octave down.
             break;
         case "D":
-            semitoneOffset = 5 - 12;
+            semitoneOffset += 5 - 12;
             break;
         case "E":
-            semitoneOffset = 7 - 12;
+            semitoneOffset += 7 - 12;
             break;
         case "F":
-            semitoneOffset = 8 - 12;
+            semitoneOffset += 8 - 12;
             break;
         case "G":
-            semitoneOffset = 10 - 12;
+            semitoneOffset += 10 - 12;
             break;
     }
     var octave = parseInt(note[1]);
@@ -61,24 +73,26 @@ function calculateFrequency(nsteps) {
 }
 
 function playSin(frequency) {
-    stop();
-    console.log("playing note @ freq="+frequency);
+    if (frequency) {
+        stop();
+        console.log("playing note @ freq="+frequency);
 
-    var osc = context.createOscillator();
-    osc.connect(masterVolume);
-    osc.frequency.value = frequency;
-    osc.type = "sine";
+        var osc = context.createOscillator();
+        osc.connect(masterVolume);
+        osc.frequency.value = frequency;
+        osc.type = "sine";
 
-    var osc2 = context.createOscillator();
-    osc2.connect(masterVolume);
-    osc2.frequency.value = frequency;
-    osc2.type = "sawtooth";
+        var osc2 = context.createOscillator();
+        osc2.connect(masterVolume);
+        osc2.frequency.value = frequency;
+        osc2.type = "sawtooth";
 
-    masterVolume.connect(context.destination);
-    osc.start(context.currentTime);
-    osc2.start(context.currentTime);
+        masterVolume.connect(context.destination);
+        osc.start(context.currentTime);
+        osc2.start(context.currentTime);
 
-    return [osc, osc2];
+        return [osc, osc2];
+    }
 }
 
 function stop() {
