@@ -111,6 +111,7 @@ function playNote(e) {
 function setVolume() {
     var vol = document.querySelector("input#volume").value;
     masterVolume.gain.value = vol;
+    localStorage.setItem('volume', vol);
     console.log("Set volume to " + vol);
 }
 
@@ -121,6 +122,10 @@ function main() {
     for (var i = 0; i < buttons.length; i++) {
         buttons.item(i).addEventListener("click", playNote, false);
     }
+    if (vol = localStorage.getItem("volume")) {
+        document.querySelector("input#volume").value = vol;
+    }
+
     document.querySelector("button#stop").addEventListener("click", stop, false);
     document.querySelector("input#volume").addEventListener("input", setVolume, false);
     setVolume();
