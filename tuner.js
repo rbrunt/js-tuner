@@ -10,13 +10,8 @@ masterVolume.gain.value = 0.15;
 
 var instruments =
 {
-    cello: {
-        A3: 220.0,
-        D3: 146.83,
-        G2: 98.0,
-        C2: 65.41
-    }
-
+    cello: ["A3", "D3", "G2", "C2"],
+    guitar: ["E2", "A2", "D3", "G3", "B3", "E4"]
 };
 
 
