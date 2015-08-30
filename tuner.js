@@ -28,7 +28,6 @@ function noteFrequency(note) {
     if (note.match(/^[ABCDEFG]S?\d/) == null) { return false; }
 
     if (note.match(/^[CDFG]S/)) { // Only allowed certain notes to be sharp
-         console.log("sharp");
          semitoneOffset += 1;
          note = note.replace("S", ""); // Get rid of the sharp, we've dealt with it...
     } else if (note.match(/^[ABE]S/)) {
@@ -105,8 +104,7 @@ function stop() {
 
 function playNote(e) {
     e.preventDefault();
-    var note = e.srcElement.dataset.note.toUpperCase();
-    console.log(note);
+    var note = e.target.dataset.note.toUpperCase();
     playingSource = playSin(noteFrequency(note));
 }
 
@@ -126,7 +124,6 @@ function main() {
     document.querySelector("button#stop").addEventListener("click", stop, false);
     document.querySelector("input#volume").addEventListener("input", setVolume, false);
     setVolume();
-    console.log("Ready");
 }
 
 window.addEventListener("load", main, false);
