@@ -19,14 +19,49 @@ var instruments =
 
 };
 
-var notes =
-{
-    frequencies: {
-        A3: 220.0,
-        D3: 146.83,
-        G2: 98.0,
-        C2: 65.41
+
+function noteFrequency(note) {
+    // Normalise:
+    note = note.toUpperCase();
+    //How many semitones above A are we?
+    var semitoneOffset = 0;
+
+    //TODO: Allow sharps, e.g. Cs4
+
+    switch (note[0]) {
+        case "A":
+            break;
+        case "B":
+            semitoneOffset = 2;
+            break;
+        case "C":
+            semitoneOffset = 3 - 12; // base of numbering is C, so C and above need to be taken an octave down.
+            break;
+        case "D":
+            semitoneOffset = 5 - 12;
+            break;
+        case "E":
+            semitoneOffset = 7 - 12;
+            break;
+        case "F":
+            semitoneOffset = 8 - 12;
+            break;
+        case "G":
+            semitoneOffset = 10 - 12;
+            break;
     }
+    var octave = parseInt(note[1]);
+    var octaveOffset = octave - 4; // Relative to A4...
+    var totalSemitoneOffset = semitoneOffset + 12 * octaveOffset;
+    return calculateFrequency(totalSemitoneOffset);
+}
+
+
+function calculateFrequency(nsteps) {
+    var f0 = 440.0; // A4 (440 Hz)
+    var a = Math.pow(2, 1/12.0)
+    var fn = f0 * Math.pow(a, nsteps);
+    return fn;
 }
 
 function playSin(frequency) {
@@ -62,7 +97,7 @@ function playNote(e) {
     e.preventDefault();
     var note = e.srcElement.dataset.note.toUpperCase();
     console.log(note);
-    playingSource = playSin(notes.frequencies[note]);
+    playingSource = playSin(noteFrequency(note));
 }
 
 function setVolume() {
