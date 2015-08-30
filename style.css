@@ -96,7 +96,7 @@ input#volume:after {
 }
 
 footer {
-    box-shadow: 0 -3px 10px 0 #000;
+    border-top: 1px solid #ccc;
     padding: 0.5em;
     min-height: 50px;
     background: #eee;
