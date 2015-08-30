@@ -9,6 +9,26 @@ div {
     margin:0;padding:0;
 }
 
+.cf:before,
+.cf:after {
+    content: " "; /* 1 */
+    display: table; /* 2 */
+}
+
+.cf:after {
+    clear: both;
+}
+
+
+.instrument {
+    padding: 0 1em;
+    width: 100%;
+    background: #fff;
+}
+.instrument:nth-child(2n+1) {
+    background: #eee;
+}
+
 .notebuttons {
     list-style-type: none;
 }
@@ -60,7 +80,7 @@ footer {
     padding: 0.5em;
     min-height: 50px;
     background: #eee;
-    position:fixed;
+    /*position:fixed;*/
     bottom:0;
     width: 100%;
 
