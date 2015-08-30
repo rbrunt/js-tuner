@@ -1,0 +1,67 @@
+* {
+    box-sizing:border-box;
+}
+html, body {
+    padding: 0; margin: 0;
+    font-family: "Open Sans", sans-serif;
+}
+div {
+    margin:0;padding:0;
+}
+
+.notebuttons {
+    list-style-type: none;
+}
+.notebuttons li {
+    float: left;
+    margin: 1em;
+    background: #359ae3;
+    display: block;
+}
+
+.notebuttons li a {
+    text-decoration: none;
+    color: #fff;
+    text-align: center;
+    min-width: 3em;
+    padding: 0.5em;
+    display: block;
+    font-weight: bold;
+}
+
+.notebuttons li:hover {
+    background: #6fbdf6;
+}
+
+
+button#stop {
+    min-width: 5rem;
+    padding: 0.5rem;
+    margin: 1rem 0.5rem;
+    background: #f23737;
+    border:none;
+    color: #fff;
+    font-weight:bold;
+    font-size:1.5rem;
+}
+
+button#stop:hover {
+    background: #ee6969;
+}
+
+input#volume:after {
+    width: 10em;
+    height: 3em;
+    display: block;
+    float: right;
+}
+
+footer {
+    padding: 0.5em;
+    min-height: 50px;
+    background: #eee;
+    position:fixed;
+    bottom:0;
+    width: 100%;
+
+}
