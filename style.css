@@ -5,6 +5,7 @@ html, body {
     padding: 0; margin: 0;
     font-family: "Open Sans", sans-serif;
 }
+
 div {
     margin:0;padding:0;
 }
@@ -20,13 +21,28 @@ div {
 }
 
 
-.instrument {
+.instrument, header {
     padding: 0 1em;
     width: 100%;
     background: #fff;
 }
 .instrument:nth-child(2n+1) {
     background: #eee;
+}
+
+header {
+    border-bottom: 1px solid #ccc;
+}
+
+h1 {
+    margin: 0.2em 0;
+    font-size:2.5em;
+}
+h2 {
+    font-size: 1.5em;
+}
+p {
+    font-size: 1.1em;
 }
 
 .notebuttons {
@@ -36,6 +52,7 @@ div {
     float: left;
     margin: 1em;
     background: #359ae3;
+    transition: all 0.3s;
     display: block;
 }
 
@@ -55,6 +72,8 @@ div {
 
 
 button#stop {
+    cursor: pointer;
+    transition: all 0.3s;
     min-width: 5rem;
     padding: 0.5rem;
     margin: 1rem 0.5rem;
@@ -77,6 +96,7 @@ input#volume:after {
 }
 
 footer {
+    box-shadow: 0 -3px 10px 0 #000;
     padding: 0.5em;
     min-height: 50px;
     background: #eee;
