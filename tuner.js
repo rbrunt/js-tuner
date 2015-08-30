@@ -6,7 +6,7 @@ var context = new AudioContext();
 var masterVolume = context.createGain();
 
 masterVolume.connect(context.destination);
-masterVolume.gain.value = 0.5;
+masterVolume.gain.value = 0.15;
 
 var instruments =
 {
@@ -32,30 +32,29 @@ var notes =
 function playSin(frequency) {
     stop();
     console.log("playing note @ freq="+frequency);
+
     var osc = context.createOscillator();
-    osc.connect(context.destination);
+    osc.connect(masterVolume);
     osc.frequency.value = frequency;
+    osc.type = "sine";
 
     var osc2 = context.createOscillator();
-    osc2.connect(context.destination);
+    osc2.connect(masterVolume);
     osc2.frequency.value = frequency;
     osc2.type = "sawtooth";
 
-
+    masterVolume.connect(context.destination);
     osc.start(context.currentTime);
     osc2.start(context.currentTime);
-    console.log([osc, osc2]);
+
     return [osc, osc2];
 }
 
 function stop() {
-    try {
+    if (typeof(playingSource) != "undefined") {
         for (var i = 0; i < playingSource.length; i++) {
             playingSource[i].stop();
         }
-
-    } catch (e) {
-        console.log(e);
     }
 }
 
@@ -66,6 +65,12 @@ function playNote(e) {
     playingSource = playSin(notes.frequencies[note]);
 }
 
+function setVolume() {
+    var vol = document.querySelector("input#volume").value;
+    masterVolume.gain.value = vol;
+    console.log("Set volume to " + vol);
+}
+
 function main() {
     // playSin(instruments.cello.G2);
 
@@ -74,6 +79,8 @@ function main() {
         buttons.item(i).addEventListener("click", playNote, false);
     }
     document.querySelector("button#stop").addEventListener("click", stop, false);
+    document.querySelector("input#volume").addEventListener("input", setVolume, false);
+    setVolume();
     console.log("Ready");
 }
 
