@@ -13,11 +13,24 @@
 
     };
 
+    /*
+        Each "tone" is a list of oscillators used to make up the sound.
+        Options for type are "sine", "sawtooth", "square", "triangle". REQUIRED
+        The gain parameter says how loud each oscillator is set. (default: 1)
+        The detune is detuning (+-) of the oscillator (default: 0)
+        TODO: maybe allow custom waveforms.
+    */
     JSTuner.prototype.tones = {
         sine: [{type: "sine", gain: 1}],
         saw: [{type: "sawtooth", gain: 1}],
-        strings: [{type: "sine", gain: 0.5},
-                {type: "sawtooth", gain: 0.5}]
+        strings: [
+            {type: "sine", gain: 0.5},
+            {type: "sawtooth", gain: 0.5}
+        ],
+        pulse: [
+            {type: "sine", detune: -5},
+            {type: "sine", detune: 5}
+        ]
     }
 
     JSTuner.prototype.calculateFrequency = function(nsteps) {
@@ -84,10 +97,11 @@
 
     JSTuner.prototype.playTone = function(frequency, tone) {
         this.stopSounds();
-        console.log("playing note @ freq="+frequency);
 
         // Get tone object, and default to strings if not provided.
         tone = !(tone in this.tones) ? this.tones.strings : this.tones[tone]
+
+        console.log("playing note @ freq="+frequency);
 
         var oscillators = [];
         var gainNodes = [];
@@ -98,11 +112,12 @@
             oscillators[i] = this.context.createOscillator();
             gainNodes[i] = this.context.createGain();
 
-            gainNodes[i].gain.value = tone[i].gain;
+            gainNodes[i].gain.value = tone[i].gain || 1;
             gainNodes[i].connect(this.output);
 
             oscillators[i].connect(gainNodes[i]);
             oscillators[i].frequency.value = frequency;
+            oscillators[i].detune.value = tone[i].detune || 0;
             oscillators[i].type = tone[i].type;
         }
 
