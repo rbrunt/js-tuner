@@ -17,7 +17,7 @@
         sine: [{type: "sine", gain: 1}],
         saw: [{type: "sawtooth", gain: 1}],
         string: [{type: "sine", gain: 1},
-                {type: "sawtooth", gain: 1}]
+                {type: "sawtooth", gain: 0.75}]
     }
 
     JSTuner.prototype.calculateFrequency = function(nsteps) {
@@ -89,11 +89,16 @@
         if (!(tone in this.tones)) { tone = this.tones.string;} // default to stings
 
         var oscillators = [];
-        //TODO: allow different mixes of oscillators, with each having its own gain node.
+        var gainNodes = [];
         // Setup:
         for (var i = 0; i < tone.length; i++) {
             oscillators[i] = this.context.createOscillator();
-            oscillators[i].connect(this.output);
+            gainNodes[i] = this.context.createGain();
+
+            gainNodes[i].gain.value = tone[i].gain;
+            gainNodes[i].connect(this.output);
+
+            oscillators[i].connect(gainNodes[i]);
             oscillators[i].frequency.value = frequency;
             oscillators[i].type = tone[i].type;
         }
