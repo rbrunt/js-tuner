@@ -1,135 +1,120 @@
-var playingSource;
+(function(window) {
 
-window.AudioContext = window.AudioContext || window.webkitAudioContext;
+    JSTuner = function(baseFrequency) {
+        this.VERSION = 0.8;
+        this.baseFrequency = typeof(baseFrequency) == "number" ? baseFrequency : 440.0;
 
-var context = new AudioContext();
-var masterVolume = context.createGain();
+        AudioContext = window.AudioContext || window.webkitAudioContext;
+        this.context = new AudioContext();
+        this.output = this.context.createGain();
+        this.output.connect(this.context.destination);
 
-masterVolume.connect(context.destination);
-masterVolume.gain.value = 0.15;
+        this.nowPlaying = undefined;
 
-var instruments =
-{
-    cello: ["A3", "D3", "G2", "C2"],
-    violin: ["G2", "D3", "A3", "E4"],
-    guitar: ["E2", "A2", "D3", "G3", "B3", "E4"],
-    bass: ["E1", "A1", "D2", "G2"]
-};
+    };
 
+    JSTuner.prototype.calculateFrequency = function(nsteps) {
+        var a = Math.pow(2, 1/12.0)
+        var fn = this.baseFrequency * Math.pow(a, nsteps);
+        return fn;
+    };
 
-function noteFrequency(note) {
-    // Normalise:
-    note = note.toUpperCase();
-    var semitoneOffset = 0; // relative to A, ignoring octaves
+    JSTuner.prototype.noteFrequency = function(note) {
+        // Normalise:
+        note = note.toUpperCase();
+        var semitoneOffset = 0; // relative to A, ignoring octaves
 
-    //Only allow valid notes
-    if (note.match(/^[ABCDEFG]S?/)) {
-            note = note + "4"; // Assume octave 4 if none given.
-    }
-    if (note.match(/^[ABCDEFG]S?\d/) == null) { return false; }
+        //Only allow valid notes
+        if (note.match(/^[ABCDEFG]S?/)) {
+                note = note + "4"; // Assume octave 4 if none given.
+        }
+        if (note.match(/^[ABCDEFG]S?\d/) == null) { return false; }
 
-    if (note.match(/^[CDFG]S/)) { // Only allowed certain notes to be sharp
-         semitoneOffset += 1;
-         note = note.replace("S", ""); // Get rid of the sharp, we've dealt with it...
-    } else if (note.match(/^[ABE]S/)) {
-        console.log("Error: invalid note. Not all notes can be \"sharp\"!");
-        return false; // Invalid note!
-    }
+        if (note.match(/^[CDFG]S/)) { // Only allowed certain notes to be sharp
+             semitoneOffset += 1;
+             note = note.replace("S", ""); // Get rid of the sharp, we've dealt with it...
+        } else if (note.match(/^[ABE]S/)) {
+            console.log("Error: invalid note. Not all notes can be \"sharp\"!");
+            return false; // Invalid note!
+        }
 
-    switch (note[0]) {
-        case "A":
-            break;
-        case "B":
-            semitoneOffset += 2;
-            break;
-        case "C":
-            semitoneOffset += 3 - 12; // base of numbering is C, so C and above need to be taken an octave down.
-            break;
-        case "D":
-            semitoneOffset += 5 - 12;
-            break;
-        case "E":
-            semitoneOffset += 7 - 12;
-            break;
-        case "F":
-            semitoneOffset += 8 - 12;
-            break;
-        case "G":
-            semitoneOffset += 10 - 12;
-            break;
-    }
-    var octave = parseInt(note[1]);
-    var octaveOffset = octave - 4; // Relative to A4...
-    var totalSemitoneOffset = semitoneOffset + 12 * octaveOffset;
-    return calculateFrequency(totalSemitoneOffset);
-}
+        switch (note[0]) {
+            case "A":
+                break;
+            case "B":
+                semitoneOffset += 2;
+                break;
+            case "C":
+                semitoneOffset += 3 - 12; // base of numbering is C, so C and above need to be taken an octave down.
+                break;
+            case "D":
+                semitoneOffset += 5 - 12;
+                break;
+            case "E":
+                semitoneOffset += 7 - 12;
+                break;
+            case "F":
+                semitoneOffset += 8 - 12;
+                break;
+            case "G":
+                semitoneOffset += 10 - 12;
+                break;
+        }
 
+        var octave = parseInt(note[1]);
+        var octaveOffset = octave - 4; // Relative to A4...
+        var totalSemitoneOffset = semitoneOffset + 12 * octaveOffset;
+        return this.calculateFrequency(totalSemitoneOffset);
+    };
 
-function calculateFrequency(nsteps) {
-    var f0 = 440.0; // A4 (440 Hz)
-    var a = Math.pow(2, 1/12.0)
-    var fn = f0 * Math.pow(a, nsteps);
-    return fn;
-}
+    JSTuner.prototype.stopSounds = function() {
+        if (typeof(this.nowPlaying) != "undefined") {
+            for (var i = 0; i < this.nowPlaying.length; i++) {
+                this.nowPlaying[i].stop();
+            }
+        }
+    };
 
-function playSin(frequency) {
-    if (frequency) {
-        stop();
+    JSTuner.prototype.playTone = function(frequency) {
+        this.stopSounds();
         console.log("playing note @ freq="+frequency);
 
-        var osc = context.createOscillator();
-        osc.connect(masterVolume);
+        var osc = this.context.createOscillator();
+        osc.connect(this.output);
         osc.frequency.value = frequency;
         osc.type = "sine";
 
-        var osc2 = context.createOscillator();
-        osc2.connect(masterVolume);
+        var osc2 = this.context.createOscillator();
+        osc2.connect(this.output);
         osc2.frequency.value = frequency;
         osc2.type = "sawtooth";
 
-        masterVolume.connect(context.destination);
-        osc.start(context.currentTime);
-        osc2.start(context.currentTime);
+        this.output.connect(this.context.destination);
+        osc.start(this.context.currentTime);
+        osc2.start(this.context.currentTime);
 
-        return [osc, osc2];
-    }
-}
+        this.nowPlaying = [osc, osc2];
+    };
 
-function stop() {
-    if (typeof(playingSource) != "undefined") {
-        for (var i = 0; i < playingSource.length; i++) {
-            playingSource[i].stop();
-        }
-    }
-}
+    JSTuner.prototype.playNote = function(note) {
+        if (frequency = this.noteFrequency(note)) {this.playTone(frequency)} else {return false;};
+    };
 
-function playNote(e) {
-    e.preventDefault();
-    var note = e.target.dataset.note.toUpperCase();
-    playingSource = playSin(noteFrequency(note));
-}
 
-function setVolume() {
-    var vol = document.querySelector("input#volume").value;
-    masterVolume.gain.value = vol;
-    localStorage.setItem('volume', vol);
-    console.log("Set volume to " + vol);
-}
 
-function main() {
-    // playSin(instruments.cello.G2);
+    JSTuner.prototype.setVolume = function(vol) {
+        this.output.gain.value = vol;
+        localStorage.setItem('volume', vol);
+        console.log("Set volume to " + vol);
+    };
 
-    var buttons = document.querySelectorAll(".note");
-    for (var i = 0; i < buttons.length; i++) {
-        buttons.item(i).addEventListener("click", playNote, false);
-    }
-    if (vol = localStorage.getItem("volume")) {
-        document.querySelector("input#volume").value = vol;
-    }
+    JSTuner.prototype.instruments = {
+        cello: ["A3", "D3", "G2", "C2"],
+        violin: ["G2", "D3", "A3", "E4"],
+        guitar: ["E2", "A2", "D3", "G3", "B3", "E4"],
+        bass: ["E1", "A1", "D2", "G2"]
+    };
 
-    document.querySelector("button#stop").addEventListener("click", stop, false);
-    document.querySelector("input#volume").addEventListener("input", setVolume, false);
-    setVolume();
-}
 
-window.addEventListener("load", main, false);
+}(window));
+// this.Tuner = new Tuner();
