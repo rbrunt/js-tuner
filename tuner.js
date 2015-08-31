@@ -13,6 +13,13 @@
 
     };
 
+    JSTuner.prototype.tones = {
+        sine: [{type: "sine", gain: 1}],
+        saw: [{type: "sawtooth", gain: 1}],
+        string: [{type: "sine", gain: 1},
+                {type: "sawtooth", gain: 1}]
+    }
+
     JSTuner.prototype.calculateFrequency = function(nsteps) {
         var a = Math.pow(2, 1/12.0)
         var fn = this.baseFrequency * Math.pow(a, nsteps);
@@ -75,25 +82,28 @@
         }
     };
 
-    JSTuner.prototype.playTone = function(frequency) {
+    JSTuner.prototype.playTone = function(frequency, tone) {
         this.stopSounds();
         console.log("playing note @ freq="+frequency);
 
-        var osc = this.context.createOscillator();
-        osc.connect(this.output);
-        osc.frequency.value = frequency;
-        osc.type = "sine";
+        if (!(tone in this.tones)) { tone = this.tones.string;} // default to stings
 
-        var osc2 = this.context.createOscillator();
-        osc2.connect(this.output);
-        osc2.frequency.value = frequency;
-        osc2.type = "sawtooth";
+        var oscillators = [];
+        //TODO: allow different mixes of oscillators, with each having its own gain node.
+        // Setup:
+        for (var i = 0; i < tone.length; i++) {
+            oscillators[i] = this.context.createOscillator();
+            oscillators[i].connect(this.output);
+            oscillators[i].frequency.value = frequency;
+            oscillators[i].type = tone[i].type;
+        }
 
-        this.output.connect(this.context.destination);
-        osc.start(this.context.currentTime);
-        osc2.start(this.context.currentTime);
+        // Start:
+        for (var i = 0; i < oscillators.length; i++) {
+            oscillators[i].start(this.context.currentTime);
+        }
 
-        this.nowPlaying = [osc, osc2];
+        this.nowPlaying = oscillators;
     };
 
     JSTuner.prototype.playNote = function(note) {
