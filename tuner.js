@@ -16,8 +16,8 @@
     JSTuner.prototype.tones = {
         sine: [{type: "sine", gain: 1}],
         saw: [{type: "sawtooth", gain: 1}],
-        string: [{type: "sine", gain: 1},
-                {type: "sawtooth", gain: 0.75}]
+        strings: [{type: "sine", gain: 0.5},
+                {type: "sawtooth", gain: 0.5}]
     }
 
     JSTuner.prototype.calculateFrequency = function(nsteps) {
@@ -86,11 +86,14 @@
         this.stopSounds();
         console.log("playing note @ freq="+frequency);
 
-        if (!(tone in this.tones)) { tone = this.tones.string;} // default to stings
+        // Get tone object, and default to strings if not provided.
+        tone = !(tone in this.tones) ? this.tones.strings : this.tones[tone]
 
         var oscillators = [];
         var gainNodes = [];
         // Setup:
+        console.log(tone.length);
+        console.log(tone);
         for (var i = 0; i < tone.length; i++) {
             oscillators[i] = this.context.createOscillator();
             gainNodes[i] = this.context.createGain();
@@ -112,7 +115,7 @@
     };
 
     JSTuner.prototype.playNote = function(note) {
-        if (frequency = this.noteFrequency(note)) {this.playTone(frequency)} else {return false;};
+        if (frequency = this.noteFrequency(note)) {this.playTone(frequency, "string")} else {return false;};
     };
 
 
