@@ -1,4 +1,4 @@
-(function() {
+(function(window) {
 
     Tuner = function(baseFrequency) {
         this.VERSION = 0.8;
@@ -109,9 +109,9 @@
     }
 
 
-}());
+}(window));
 
-this.Tuner = new Tuner();
+// this.Tuner = new Tuner();
 
 
 
@@ -122,38 +122,3 @@ var instruments =
     guitar: ["E2", "A2", "D3", "G3", "B3", "E4"],
     bass: ["E1", "A1", "D2", "G2"]
 };
-
-
-var setVolume = function(vol) {
-    var vol = document.querySelector("input#volume").value;
-    Tuner.setVolume(vol);
-}
-
-var playNote = function(e) {
-    e.preventDefault();
-    var note = e.target.dataset.note.toUpperCase();
-    Tuner.playNote(note);
-}
-
-var stop = function() {
-    Tuner.stopSounds();
-}
-
-
-function main() {
-    // playSin(instruments.cello.G2);
-
-    var buttons = document.querySelectorAll(".note");
-    for (var i = 0; i < buttons.length; i++) {
-        buttons.item(i).addEventListener("click", playNote, false);
-    }
-    if (vol = localStorage.getItem("volume")) {
-        document.querySelector("input#volume").value = vol;
-    }
-
-    document.querySelector("button#stop").addEventListener("click", stop, false);
-    document.querySelector("input#volume").addEventListener("input", setVolume, false);
-    setVolume();
-}
-
-window.addEventListener("load", main, false);
