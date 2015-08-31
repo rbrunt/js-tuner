@@ -13,6 +13,26 @@
 
     };
 
+    /*
+        Each "tone" is a list of oscillators used to make up the sound.
+        Options for type are "sine", "sawtooth", "square", "triangle". REQUIRED
+        The gain parameter says how loud each oscillator is set. (default: 1)
+        The detune is detuning (+-) of the oscillator (default: 0)
+        TODO: maybe allow custom waveforms.
+    */
+    JSTuner.prototype.tones = {
+        sine: [{type: "sine", gain: 1}],
+        saw: [{type: "sawtooth", gain: 1}],
+        strings: [
+            {type: "sine", gain: 0.5},
+            {type: "sawtooth", gain: 0.5}
+        ],
+        pulse: [
+            {type: "sine", detune: -5},
+            {type: "sine", detune: 5}
+        ]
+    }
+
     JSTuner.prototype.calculateFrequency = function(nsteps) {
         var a = Math.pow(2, 1/12.0)
         var fn = this.baseFrequency * Math.pow(a, nsteps);
@@ -75,29 +95,42 @@
         }
     };
 
-    JSTuner.prototype.playTone = function(frequency) {
+    JSTuner.prototype.playTone = function(frequency, tone) {
         this.stopSounds();
+
+        // Get tone object, and default to strings if not provided.
+        tone = !(tone in this.tones) ? this.tones.strings : this.tones[tone]
+
         console.log("playing note @ freq="+frequency);
 
-        var osc = this.context.createOscillator();
-        osc.connect(this.output);
-        osc.frequency.value = frequency;
-        osc.type = "sine";
+        var oscillators = [];
+        var gainNodes = [];
+        // Setup:
+        console.log(tone.length);
+        console.log(tone);
+        for (var i = 0; i < tone.length; i++) {
+            oscillators[i] = this.context.createOscillator();
+            gainNodes[i] = this.context.createGain();
 
-        var osc2 = this.context.createOscillator();
-        osc2.connect(this.output);
-        osc2.frequency.value = frequency;
-        osc2.type = "sawtooth";
+            gainNodes[i].gain.value = tone[i].gain || 1;
+            gainNodes[i].connect(this.output);
 
-        this.output.connect(this.context.destination);
-        osc.start(this.context.currentTime);
-        osc2.start(this.context.currentTime);
+            oscillators[i].connect(gainNodes[i]);
+            oscillators[i].frequency.value = frequency;
+            oscillators[i].detune.value = tone[i].detune || 0;
+            oscillators[i].type = tone[i].type;
+        }
 
-        this.nowPlaying = [osc, osc2];
+        // Start:
+        for (var i = 0; i < oscillators.length; i++) {
+            oscillators[i].start(this.context.currentTime);
+        }
+
+        this.nowPlaying = oscillators;
     };
 
     JSTuner.prototype.playNote = function(note) {
-        if (frequency = this.noteFrequency(note)) {this.playTone(frequency)} else {return false;};
+        if (frequency = this.noteFrequency(note)) {this.playTone(frequency, "string")} else {return false;};
     };
 
 
