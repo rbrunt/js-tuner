@@ -82,6 +82,7 @@
                 var buttons = document.querySelectorAll(".note");
                 for (var i = 0; i < buttons.length; i++) {
                     buttons.item(i).addEventListener("click", playNote, false);
+                    buttons.item(i).addEventListener("touchstart", playNote, false);
                 }
                 if (vol = localStorage.getItem("volume")) {
                     document.querySelector("input#volume").value = vol;
