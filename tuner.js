@@ -1,6 +1,6 @@
 (function(window) {
 
-    Tuner = function(baseFrequency) {
+    JSTuner = function(baseFrequency) {
         this.VERSION = 0.8;
         this.baseFrequency = typeof(baseFrequency) == "number" ? baseFrequency : 440.0;
 
@@ -13,13 +13,13 @@
 
     };
 
-    Tuner.prototype.calculateFrequency = function(nsteps) {
+    JSTuner.prototype.calculateFrequency = function(nsteps) {
         var a = Math.pow(2, 1/12.0)
         var fn = this.baseFrequency * Math.pow(a, nsteps);
         return fn;
     };
 
-    Tuner.prototype.noteFrequency = function(note) {
+    JSTuner.prototype.noteFrequency = function(note) {
         // Normalise:
         note = note.toUpperCase();
         var semitoneOffset = 0; // relative to A, ignoring octaves
@@ -65,17 +65,17 @@
         var octaveOffset = octave - 4; // Relative to A4...
         var totalSemitoneOffset = semitoneOffset + 12 * octaveOffset;
         return this.calculateFrequency(totalSemitoneOffset);
-    }
+    };
 
-    Tuner.prototype.stopSounds = function() {
+    JSTuner.prototype.stopSounds = function() {
         if (typeof(this.nowPlaying) != "undefined") {
             for (var i = 0; i < this.nowPlaying.length; i++) {
                 this.nowPlaying[i].stop();
             }
         }
-    }
+    };
 
-    Tuner.prototype.playTone = function(frequency) {
+    JSTuner.prototype.playTone = function(frequency) {
         this.stopSounds();
         console.log("playing note @ freq="+frequency);
 
@@ -94,31 +94,27 @@
         osc2.start(this.context.currentTime);
 
         this.nowPlaying = [osc, osc2];
-    }
+    };
 
-    Tuner.prototype.playNote = function(note) {
+    JSTuner.prototype.playNote = function(note) {
         if (frequency = this.noteFrequency(note)) {this.playTone(frequency)} else {return false;};
-    }
+    };
 
 
 
-    Tuner.prototype.setVolume = function(vol) {
+    JSTuner.prototype.setVolume = function(vol) {
         this.output.gain.value = vol;
         localStorage.setItem('volume', vol);
         console.log("Set volume to " + vol);
-    }
+    };
+
+    JSTuner.prototype.instruments = {
+        cello: ["A3", "D3", "G2", "C2"],
+        violin: ["G2", "D3", "A3", "E4"],
+        guitar: ["E2", "A2", "D3", "G3", "B3", "E4"],
+        bass: ["E1", "A1", "D2", "G2"]
+    };
 
 
 }(window));
-
 // this.Tuner = new Tuner();
-
-
-
-var instruments =
-{
-    cello: ["A3", "D3", "G2", "C2"],
-    violin: ["G2", "D3", "A3", "E4"],
-    guitar: ["E2", "A2", "D3", "G3", "B3", "E4"],
-    bass: ["E1", "A1", "D2", "G2"]
-};
