@@ -31,10 +31,10 @@
             {type: "sine", detune: -5},
             {type: "sine", detune: 5}
         ]
-    }
+    };
 
     JSTuner.prototype.calculateFrequency = function(nsteps) {
-        var a = Math.pow(2, 1/12.0)
+        var a = Math.pow(2, 1/12.0);
         var fn = this.baseFrequency * Math.pow(a, nsteps);
         return fn;
     };
@@ -48,7 +48,7 @@
         if (note.match(/^[ABCDEFG]S?/)) {
                 note = note + "4"; // Assume octave 4 if none given.
         }
-        if (note.match(/^[ABCDEFG]S?\d/) == null) { return false; }
+        if (note.match(/^[ABCDEFG]S?\d/) === null) { return false; }
 
         if (note.match(/^[CDFG]S/)) { // Only allowed certain notes to be sharp
              semitoneOffset += 1;
@@ -99,7 +99,7 @@
         this.stopSounds();
 
         // Get tone object, and default to strings if not provided.
-        tone = !(tone in this.tones) ? this.tones.strings : this.tones[tone]
+        tone = !(tone in this.tones) ? this.tones.strings : this.tones[tone];
 
         console.log("playing note @ freq="+frequency);
 
