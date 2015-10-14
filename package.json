@@ -1,0 +1,19 @@
+{
+  "name": "js-tuner",
+  "productName": "JS Tuner",
+  "version": "0.0.1",
+  "description": "JS tuner using the Web Audio API for synth and analysis.",
+  "license": "MIT",
+  "repository": "rbrunt/js-tuner",
+  "author": {
+    "name": "Richard Brunt",
+    "email": "r.brunt@gmail.com",
+    "url": "richardbrunt.co.uk"
+  },
+  "engines": {
+    "node": ">=4"
+  },
+  "scripts": {
+    "test": ""
+  }
+}
