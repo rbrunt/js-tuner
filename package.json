@@ -10,6 +10,7 @@
     "email": "r.brunt@gmail.com",
     "url": "richardbrunt.co.uk"
   },
+  "main": "tuner.js",
   "engines": {
     "node": ">=4"
   },
